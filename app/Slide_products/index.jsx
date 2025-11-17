@@ -52,8 +52,8 @@ export const SlideProductos = () => {
         
         <Text style={styles.logo}>TUUDU</Text>
         
-        <View style={styles.avatar}>
-          <View style={styles.avatarCircle} />
+        <View style={styles.profile}>
+          <View style={styles.profileCircle} />
         </View>
       </View>
 
@@ -72,15 +72,15 @@ export const SlideProductos = () => {
             </View>
             <Text style={styles.productoPrecio}>{producto.precio}</Text>
             <TouchableOpacity onPress={() => abrirOpciones(producto)}>
-              <Text style={styles.arrowIcon}>›</Text>
+              <Text style={styles.flechaIcono}>›</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
       {/* Botón Agregar */}
-      <TouchableOpacity style={styles.botonAgregar}>
-        <Text style={styles.plusIcon}>+</Text>
+      <TouchableOpacity style={styles.btnAgregar}>
+        <Text style={styles.agregarIcono}>+</Text>
       </TouchableOpacity>
 
       {/* Imagen de fondo decorativa */}
@@ -102,7 +102,7 @@ export const SlideProductos = () => {
             style={styles.modalContent}
             activeOpacity={1}
           >
-            {/* Toggle - Desactivar producto */}
+            {/* Toggle: Desactivar producto */}
             <View style={styles.opcionRow}>
               <TouchableOpacity 
                 style={[styles.toggle, productoActivo && styles.toggleActive]}
@@ -110,7 +110,7 @@ export const SlideProductos = () => {
               >
                 <View style={[styles.toggleCircle, productoActivo && styles.toggleCircleActive]} />
               </TouchableOpacity>
-              <Text style={styles.opcionTexto}>Desactivar producto</Text>
+              <Text style={styles.opcionTxt}>Desactivar producto</Text>
             </View>
 
             {/* Detalles del producto */}
@@ -122,12 +122,12 @@ export const SlideProductos = () => {
                   <View style={styles.iconoLinea} />
                 </View>
               </View>
-              <Text style={styles.opcionTexto}>Detalles del producto</Text>
+              <Text style={styles.opcionTxt}>Detalles del producto</Text>
             </TouchableOpacity>
 
             {/* Botón Cancelar */}
-            <TouchableOpacity style={styles.botonCancelar} onPress={cerrarModal}>
-              <Text style={styles.botonCancelarTexto}>Cancelar</Text>
+            <TouchableOpacity style={styles.btnCancelar} onPress={cerrarModal}>
+              <Text style={styles.btnCancelarTxt}>Cancelar</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         </TouchableOpacity>
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     left: "50%",
     marginLeft: -54,
   },
-  avatar: {
+  profile: {
     width: 40,
     height: 40,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarCircle: {
+  profileCircle: {
     width: 24,
     height: 24,
     backgroundColor: "rgba(255, 255, 255, 0.4)",
@@ -232,12 +232,12 @@ const styles = StyleSheet.create({
     color: "#000000",
     marginRight: 8,
   },
-  arrowIcon: {
+  flechaIcono: {
     fontSize: 20,
     color: "#CCCCCC",
     marginRight: 12,
   },
-  botonAgregar: {
+  btnAgregar: {
     position: "absolute",
     bottom: 40,
     right: 40,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  plusIcon: {
+  agregarIcono: {
     color: "#FFFFFF",
     fontSize: 32,
     fontWeight: "300",
@@ -331,19 +331,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#1976D2", // Azul
     borderRadius: 1,
   },
-  opcionTexto: {
+  opcionTxt: {
     fontSize: 16,
     fontWeight: "400",
     color: "#1976D2", // Azul
   },
-  botonCancelar: {
+  btnCancelar: {
     backgroundColor: "#BBDEFB", // Azul claro
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
     marginTop: 12,
   },
-  botonCancelarTexto: {
+  btnCancelarTxt: {
     fontSize: 16,
     fontWeight: "500",
     color: "#1976D2", // Azul oscuro
