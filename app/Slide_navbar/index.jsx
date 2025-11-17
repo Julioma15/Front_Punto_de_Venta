@@ -17,10 +17,8 @@ const SlideNavbar = ({onClose }) => {
   ];
 
   const GestorDeEventos = (item) => {
-    console.log('Navegando a:', item.title);
     if (onClose) onClose();
     
-    // Navega según el item
     if (item.title === 'Productos') {
       router.push('../Slide_productos');
     }else if (item.title === 'Log-out'){

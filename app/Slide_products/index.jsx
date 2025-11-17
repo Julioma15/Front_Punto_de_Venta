@@ -88,7 +88,7 @@ const SlideProductos = () => {
         <Text style={styles.agregarIcono}>+</Text>
       </TouchableOpacity>
 
-      {/* Imagen de fondo decorativa */}
+      {/* Imagen de fondo para decorar */}
       <View style={styles.bgDecoration} />
 
       {/* Modal de Opciones */}
