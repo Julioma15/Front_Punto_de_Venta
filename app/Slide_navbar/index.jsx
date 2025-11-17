@@ -1,6 +1,9 @@
+import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export const SlideNavbar = ({ navigation, onClose }) => {
+const SlideNavbar = ({onClose }) => {
+  const router = useRouter();
+
   const menuItems = [
     { id: 1, title: "Productos", subtitle: null },
     { id: 2, title: "Inventario", subtitle: null },
@@ -13,18 +16,23 @@ export const SlideNavbar = ({ navigation, onClose }) => {
     { id: 5, title: "Log-out", subtitle: null },
   ];
 
-  const handleMenuPress = (item) => {
+  const GestorDeEventos = (item) => {
     console.log('Navegando a:', item.title);
     if (onClose) onClose();
-    // Aquí puedes agregar navegación específica
-    // navigation.navigate(item.title);
+    
+    // Navega según el item
+    if (item.title === 'Productos') {
+      router.push('../Slide_productos');
+    }else if (item.title === 'Log-out'){
+        router.push('../Slide_LogIn');
+    } 
   };
 
   return (
     <View style={styles.container}>
       {/* Botón de cerrar */}
-      <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-        <Text style={styles.arrowIcon}>←</Text>
+      <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+        <Text style={styles.flechaIcono}>←</Text>
       </TouchableOpacity>
 
       {/* Línea superior */}
@@ -36,12 +44,12 @@ export const SlideNavbar = ({ navigation, onClose }) => {
           <View key={item.id}>
             <TouchableOpacity 
               style={styles.menuItem}
-              onPress={() => handleMenuPress(item)}
+              onPress={() => GestorDeEventos(item)}
             >
               <Text style={styles.menuTxt}>{item.title}</Text>
             </TouchableOpacity>
 
-            {/* Subtítulos si existen */}
+            {/* Analizando las Subtítulos (subsecciones)*/}
             {item.subtitle && (
               <View style={styles.submenuContainer}>
                 {item.subtitle.map((sub, subIndex) => (
@@ -79,7 +87,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  closeButton: {
+  closeBtn: {
     position: "absolute",
     top: 20,
     right: 18,
@@ -88,7 +96,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  arrowIcon: {
+  flechaIcono: {
     fontSize: 24,
     color: "#006FFD",
     fontWeight: "600",

@@ -1,8 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from "react";
 import { Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import SlideNavbar from '../Slide_navbar/index';
 
-export const SlideProductos = () => {
+const SlideProductos = () => {
+  const [menuVisible, setMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [productoActivo, setProductoActivo] = useState(true);
@@ -47,7 +49,7 @@ export const SlideProductos = () => {
     <View style={styles.container}>
       {/* Navbar */}
       <View style={styles.navbar}>
-        <TouchableOpacity style={styles.menuIcon}>
+        <TouchableOpacity style={styles.menuIcon} onPress={() => setMenuVisible(true)}>
           <View style={styles.menuLine} />
           <View style={styles.menuLine} />
           <View style={styles.menuLine} />
@@ -134,6 +136,26 @@ export const SlideProductos = () => {
             </TouchableOpacity>
           </TouchableOpacity>
         </TouchableOpacity>
+      </Modal>
+
+      {/* Modal del Menú Lateral (SlideNavbar) */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={menuVisible}
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <View style={styles.menuModalContainer}>
+          <SlideNavbar 
+            //navigation={navigation}
+            onClose={() => setMenuVisible(false)}
+          />
+          <TouchableOpacity 
+            style={styles.menuOverlay}
+            activeOpacity={1}
+            onPress={() => setMenuVisible(false)}
+          />
+        </View>
       </Modal>
 
     </View>
@@ -350,6 +372,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     color: "#1976D2", // Azul oscuro
+  },
+  menuModalContainer: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });
 

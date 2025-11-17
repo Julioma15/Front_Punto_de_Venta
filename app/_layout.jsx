@@ -1,15 +1,5 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
-const SlideProducts_Layout = ()=>{
-    return (
-        <Stack
-            screenOptions={{
-                headerShown: false //Que no muestre otro menu. Unicamente aparece el del index.jsx
-            }}    
-
-        />
-
-    )
+export default function RootLayout() {
+  return <Stack />;
 }
-
-export default SlideProducts_Layout
