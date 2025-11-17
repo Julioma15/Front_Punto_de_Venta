@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useState } from "react";
 import { Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -5,6 +6,8 @@ export const SlideProductos = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [productoActivo, setProductoActivo] = useState(true);
+
+  const router = useRouter()
 
   const productos = [
     {
@@ -114,7 +117,7 @@ export const SlideProductos = () => {
             </View>
 
             {/* Detalles del producto */}
-            <TouchableOpacity style={styles.opcionRow}>
+            <TouchableOpacity style={styles.opcionRow} onPress={()=>router.push('./Detalles_producto')}>
               <View style={styles.iconContainer}>
                 <View style={styles.iconoGrid}>
                   <View style={styles.iconoLinea} />

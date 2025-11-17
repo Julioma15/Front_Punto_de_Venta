@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-const SlideProducts_Layout = ()=>{
+const SlideNavbar_Layout = ()=>{
     return (
         <Stack
             screenOptions={{
@@ -12,4 +12,4 @@ const SlideProducts_Layout = ()=>{
     )
 }
 
-export default SlideProducts_Layout
+export default SlideNavbar_Layout
