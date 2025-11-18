@@ -119,7 +119,7 @@ const SlideProductos = () => {
             </View>
 
             {/* Detalles del producto */}
-            <TouchableOpacity style={styles.opcionRow} onPress={()=>router.push('./Detalles_producto')}>
+            <TouchableOpacity style={styles.opcionRow} onPress={() => { cerrarModal(); router.push('./Detalles_producto'); }}>
               <View style={styles.iconContainer}>
                 <View style={styles.iconoGrid}>
                   <View style={styles.iconoLinea} />
