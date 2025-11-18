@@ -1,7 +1,8 @@
+import React, { useEffect, useRef } from "react";
+import { View, Text, Image, StyleSheet, Animated, Dimensions } from "react-native";
 import { router } from "expo-router";
-import { useEffect, useRef } from "react";
-import { Animated, Image, StyleSheet, Text, View } from "react-native";
 
+const { width, height } = Dimensions.get("window");
 
 export default function SplashScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -22,25 +23,36 @@ export default function SplashScreen() {
     ]).start();
 
     setTimeout(() => {
-      // cambia a login
-      router.replace("/auth/login");
+      router.replace("/Slide_login/login");
     }, 1500);
   }, []);
 
   return (
     <View style={styles.container}>
-      <View style={styles.ellipse} />
+      {/* FONDO DE CÍRCULOS */}
+      <Image
+        source={require("../app/assets/images/circulos-marco.png")}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
 
-      <Animated.View style={[styles.group, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-        <Image source={require("../app/assets/images/kiosco-logo.png")} style={styles.logo} />
+      {/* CONTENIDO ANIMADO */}
+      <Animated.View style={[styles.centerGroup, {
+        opacity: fadeAnim,
+        transform: [{ scale: scaleAnim }]
+      }]}>
+        
+        <Text style={styles.title}>TUUDU</Text>
 
-        <View style={styles.textGroup}>
-          
-          <Text style={styles.title}>TUUDU</Text>
-        </View>
+        <Image
+          source={require("../app/assets/images/kiosco-logo.png")}
+          style={styles.kiosko}
+        />
+
+        {/* Punto indicador */}
+        <Text style={styles.dots}>● ● ●</Text>
+
       </Animated.View>
-
-      <Text style={styles.loading}>. . .</Text>
     </View>
   );
 }
@@ -48,49 +60,42 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
+    alignItems: "center",
     justifyContent: "center",
+  },
+
+  backgroundImage: {
+    position: "absolute",
+    width: width,
+    height: height,
+    top: 0,
+    left: 0,
+  },
+
+  centerGroup: {
     alignItems: "center",
-    position: "relative",
+    justifyContent: "center",
   },
-  ellipse: {
-    width: 340,
-    height: 340,
-    backgroundColor: "#eaf2ff",
-    borderRadius: 200,
-    filter: "blur(30px)",
-    position: "absolute",
-  },
-  loading: {
-    fontSize: 50,
-    fontWeight: "900",
-    position: "absolute",
-    bottom: 120,
-  },
-  group: {
-    position: "absolute",
-    alignItems: "center",
-  },
-  logo: {
-    width: 120,
-    height: 180,
-    resizeMode: "contain",
-  },
-  textGroup: {
-    alignItems: "center",
-    marginTop: -50,
-  },
-  union: {
-    width: 200,
-    height: 120,
-    resizeMode: "contain",
-    position: "absolute",
-    top: -25,
-  },
+
   title: {
-    fontSize: 50,
+    fontSize: 42,
     fontWeight: "900",
+    marginBottom: 20,
     textShadowColor: "#00000040",
     textShadowRadius: 4,
+  },
+
+  kiosko: {
+    width: 180,
+    height: 240,
+    resizeMode: "contain",
+    marginVertical: 15,
+  },
+
+  dots: {
+    marginTop: 20,
+    fontSize: 30,
+    opacity: 0.7,
   },
 });
