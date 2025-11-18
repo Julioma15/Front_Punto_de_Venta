@@ -23,9 +23,6 @@ export default function LoginScreen() {
 
   const handleLogin = (user, pass) => {
 
-    // 🔥 AQUÍ VA TU RUTA FINAL
-    // router.replace("/dashboard"); // ← cuando tengas la pantalla lista
-
     router.replace("/Slide_products"); // o coméntala, depende de tu app
   };
 
