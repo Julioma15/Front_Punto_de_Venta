@@ -65,7 +65,7 @@ const SlideProductos = () => {
       {/* Lista de Productos */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.productosContainer}>
         {productos.map((producto) => (
-          <TouchableOpacity key={producto.id} style={styles.productoCard}>
+          <TouchableOpacity key={producto.id} style={styles.productoCard} onPress={() => router.push('/Detalles_producto')}>
             <Image 
               source={producto.imagen}
               style={styles.productoImagen}
