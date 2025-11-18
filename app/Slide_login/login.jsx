@@ -23,7 +23,7 @@ export default function LoginScreen() {
 
   const handleLogin = (user, pass) => {
 
-    router.replace("/Slide_products"); // o coméntala, depende de tu app
+    router.replace("/Slide_products");
   };
 
   return (
