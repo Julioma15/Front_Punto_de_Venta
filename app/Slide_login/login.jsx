@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, Image, StyleSheet, View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import LoginBox from "../../components/ui/LoginBox";
 
 export default function LoginScreen() {
@@ -30,20 +31,22 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.ellipse} />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.container}>
+        <View style={styles.ellipse} />
 
-      <Animated.View
-        style={{
-          transform: [{ translateY: translateAnim }],
-          opacity: fadeAnim,
-          alignItems: "center",
-        }}
-      >
-        <Image source={require("../assets/images/logo-globo.png")} style={styles.logo} />
-        <LoginBox onSubmit={handleLogin} />
-      </Animated.View>
-    </View>
+        <Animated.View
+          style={{
+            transform: [{ translateY: translateAnim }],
+            opacity: fadeAnim,
+            alignItems: "center",
+          }}
+        >
+          <Image source={require("../assets/images/logo-globo.png")} style={styles.logo} />
+          <LoginBox onSubmit={handleLogin} />
+        </Animated.View>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -79,5 +82,9 @@ const styles = StyleSheet.create({
   },
   logo: {
     marginBlock: 20,
-  }
+  }, 
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#006FFD", //Color del navbar
+  },
 });

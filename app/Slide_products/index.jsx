@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from "react";
 import { Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import SlideNavbar from '../Slide_navbar/index';
 
 const SlideProductos = () => {
@@ -46,119 +47,121 @@ const SlideProductos = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Navbar */}
-      <View style={styles.navbar}>
-        <TouchableOpacity style={styles.menuIcon} onPress={() => setMenuVisible(true)}>
-          <View style={styles.menuLine} />
-          <View style={styles.menuLine} />
-          <View style={styles.menuLine} />
-        </TouchableOpacity>
-        
-        <Text style={styles.logo}>TUUDU</Text>
-        
-        <View style={styles.profile}>
-          <View style={styles.profileCircle} />
-        </View>
-      </View>
-
-      {/* Lista de Productos */}
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.productosContainer}>
-        {productos.map((producto) => (
-          <TouchableOpacity key={producto.id} style={styles.productoCard} onPress={() => router.push('/Detalles_producto')}>
-            <Image 
-              source={producto.imagen}
-              style={styles.productoImagen}
-              resizeMode="cover"
-            />
-            <View style={styles.productoInfo}>
-              <Text style={styles.productoNombre}>{producto.nombre}</Text>
-              <Text style={styles.productoStock}>Stock: {producto.stock}</Text>
-            </View>
-            <Text style={styles.productoPrecio}>{producto.precio}</Text>
-            <TouchableOpacity onPress={() => abrirOpciones(producto)}>
-              <Text style={styles.flechaIcono}>›</Text>
-            </TouchableOpacity>
+    <SafeAreaView style={styles.safeArea} edges={['top']}> 
+      <View style={styles.container}>
+        {/* Navbar */}
+        <View style={styles.navbar}>
+          <TouchableOpacity style={styles.menuIcon} onPress={() => setMenuVisible(true)}>
+            <View style={styles.menuLine} />
+            <View style={styles.menuLine} />
+            <View style={styles.menuLine} />
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+          
+          <Text style={styles.logo}>TUUDU</Text>
+          
+          <View style={styles.profile}>
+            <View style={styles.profileCircle} />
+          </View>
+        </View>
 
-      {/* Botón Agregar */}
-      <TouchableOpacity style={styles.btnAgregar}>
-        <Text style={styles.agregarIcono}>+</Text>
-      </TouchableOpacity>
+        {/* Lista de Productos */}
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.productosContainer}>
+          {productos.map((producto) => (
+            <TouchableOpacity key={producto.id} style={styles.productoCard} onPress={() => router.push('/Detalles_producto')}>
+              <Image 
+                source={producto.imagen}
+                style={styles.productoImagen}
+                resizeMode="cover"
+              />
+              <View style={styles.productoInfo}>
+                <Text style={styles.productoNombre}>{producto.nombre}</Text>
+                <Text style={styles.productoStock}>Stock: {producto.stock}</Text>
+              </View>
+              <Text style={styles.productoPrecio}>{producto.precio}</Text>
+              <TouchableOpacity onPress={() => abrirOpciones(producto)}>
+                <Text style={styles.flechaIcono}>›</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
-      {/* Imagen de fondo para decorar */}
-      <View style={styles.bgDecoration} />
+        {/* Botón Agregar */}
+        <TouchableOpacity style={styles.btnAgregar}>
+          <Text style={styles.agregarIcono}>+</Text>
+        </TouchableOpacity>
 
-      {/* Modal de Opciones */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={cerrarModal}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1}
-          onPress={cerrarModal}
+        {/* Imagen de fondo para decorar */}
+        <View style={styles.bgDecoration} />
+
+        {/* Modal de Opciones */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={cerrarModal}
         >
           <TouchableOpacity 
-            style={styles.modalContent}
+            style={styles.modalOverlay} 
             activeOpacity={1}
+            onPress={cerrarModal}
           >
-            {/* Toggle: Desactivar producto */}
-            <View style={styles.opcionRow}>
-              <TouchableOpacity 
-                style={[styles.toggle, productoActivo && styles.toggleActive]}
-                onPress={() => setProductoActivo(!productoActivo)}
-              >
-                <View style={[styles.toggleCircle, productoActivo && styles.toggleCircleActive]} />
-              </TouchableOpacity>
-              <Text style={styles.opcionTxt}>Desactivar producto</Text>
-            </View>
-
-            {/* Detalles del producto */}
-            <TouchableOpacity style={styles.opcionRow} onPress={() => { cerrarModal(); router.push('./Detalles_producto'); }}>
-              <View style={styles.iconContainer}>
-                <View style={styles.iconoGrid}>
-                  <View style={styles.iconoLinea} />
-                  <View style={styles.iconoLinea} />
-                  <View style={styles.iconoLinea} />
-                </View>
+            <TouchableOpacity 
+              style={styles.modalContent}
+              activeOpacity={1}
+            >
+              {/* Toggle: Desactivar producto */}
+              <View style={styles.opcionRow}>
+                <TouchableOpacity 
+                  style={[styles.toggle, productoActivo && styles.toggleActive]}
+                  onPress={() => setProductoActivo(!productoActivo)}
+                >
+                  <View style={[styles.toggleCircle, productoActivo && styles.toggleCircleActive]} />
+                </TouchableOpacity>
+                <Text style={styles.opcionTxt}>Desactivar producto</Text>
               </View>
-              <Text style={styles.opcionTxt}>Detalles del producto</Text>
-            </TouchableOpacity>
 
-            {/* Botón Cancelar */}
-            <TouchableOpacity style={styles.btnCancelar} onPress={cerrarModal}>
-              <Text style={styles.btnCancelarTxt}>Cancelar</Text>
+              {/* Detalles del producto */}
+              <TouchableOpacity style={styles.opcionRow} onPress={() => { cerrarModal(); router.push('./Detalles_producto'); }}>
+                <View style={styles.iconContainer}>
+                  <View style={styles.iconoGrid}>
+                    <View style={styles.iconoLinea} />
+                    <View style={styles.iconoLinea} />
+                    <View style={styles.iconoLinea} />
+                  </View>
+                </View>
+                <Text style={styles.opcionTxt}>Detalles del producto</Text>
+              </TouchableOpacity>
+
+              {/* Botón Cancelar */}
+              <TouchableOpacity style={styles.btnCancelar} onPress={cerrarModal}>
+                <Text style={styles.btnCancelarTxt}>Cancelar</Text>
+              </TouchableOpacity>
             </TouchableOpacity>
           </TouchableOpacity>
-        </TouchableOpacity>
-      </Modal>
+        </Modal>
 
-      {/* Modal del Menú Lateral (SlideNavbar) */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={menuVisible}
-        onRequestClose={() => setMenuVisible(false)}
-      >
-        <View style={styles.menuModalContainer}>
-          <SlideNavbar 
-            //navigation={navigation}
-            onClose={() => setMenuVisible(false)}
-          />
-          <TouchableOpacity 
-            style={styles.menuOverlay}
-            activeOpacity={1}
-            onPress={() => setMenuVisible(false)}
-          />
-        </View>
-      </Modal>
+        {/* Modal del Menú Lateral (SlideNavbar) */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={menuVisible}
+          onRequestClose={() => setMenuVisible(false)}
+        >
+          <View style={styles.menuModalContainer}>
+            <SlideNavbar 
+              //navigation={navigation}
+              onClose={() => setMenuVisible(false)}
+            />
+            <TouchableOpacity 
+              style={styles.menuOverlay}
+              activeOpacity={1}
+              onPress={() => setMenuVisible(false)}
+            />
+          </View>
+        </Modal>
 
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -380,6 +383,10 @@ const styles = StyleSheet.create({
   menuOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#006FFD", //Color del navbar
   },
 });
 

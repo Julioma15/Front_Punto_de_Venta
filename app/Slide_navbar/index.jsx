@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SlideNavbar = ({onClose }) => {
   const router = useRouter();
@@ -27,49 +28,51 @@ const SlideNavbar = ({onClose }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Botón de cerrar */}
-      <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-        <Text style={styles.flechaIcono}>←</Text>
-      </TouchableOpacity>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.container}>
+        {/* Botón de cerrar */}
+        <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+          <Text style={styles.flechaIcono}>←</Text>
+        </TouchableOpacity>
 
-      {/* Línea superior */}
-      <View style={styles.divider} />
+        {/* Línea superior */}
+        <View style={styles.divider} />
 
-      {/* Menú Items */}
-      <View style={styles.menuContainer}>
-        {menuItems.map((item, index) => (
-          <View key={item.id}>
-            <TouchableOpacity 
-              style={styles.menuItem}
-              onPress={() => GestorDeEventos(item)}
-            >
-              <Text style={styles.menuTxt}>{item.title}</Text>
-            </TouchableOpacity>
+        {/* Menú Items */}
+        <View style={styles.menuContainer}>
+          {menuItems.map((item, index) => (
+            <View key={item.id}>
+              <TouchableOpacity 
+                style={styles.menuItem}
+                onPress={() => GestorDeEventos(item)}
+              >
+                <Text style={styles.menuTxt}>{item.title}</Text>
+              </TouchableOpacity>
 
-            {/* Analizando las Subtítulos (subsecciones)*/}
-            {item.subtitle && (
-              <View style={styles.submenuContainer}>
-                {item.subtitle.map((sub, subIndex) => (
-                  <TouchableOpacity 
-                    key={subIndex} 
-                    style={styles.submenuItem}
-                    onPress={() => console.log('Submenu:', sub)}
-                  >
-                    <Text style={styles.submenuTxt}>{sub}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
+              {/* Analizando las Subtítulos (subsecciones)*/}
+              {item.subtitle && (
+                <View style={styles.submenuContainer}>
+                  {item.subtitle.map((sub, subIndex) => (
+                    <TouchableOpacity 
+                      key={subIndex} 
+                      style={styles.submenuItem}
+                      onPress={() => console.log('Submenu:', sub)}
+                    >
+                      <Text style={styles.submenuTxt}>{sub}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
 
-            {/* Líneas divisoras */}
-            {index < menuItems.length - 1 && (
-              <View style={styles.menuDivider} />
-            )}
-          </View>
-        ))}
+              {/* Líneas divisoras */}
+              {index < menuItems.length - 1 && (
+                <View style={styles.menuDivider} />
+              )}
+            </View>
+          ))}
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -137,6 +140,10 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#E0E0E0",
     marginVertical: 4,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff", //Color del navbar
   },
 });
 

@@ -1,4 +1,6 @@
 import { useRouter } from 'expo-router';
+import { StyleSheet } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ProductDetails from '../../components/ProductDetails';
 
 export default function DetallesProductoPage() {
@@ -14,5 +16,16 @@ export default function DetallesProductoPage() {
     image: require('../assets/images/sabritas_original.png'),
   };
 
-  return <ProductDetails product={product} onBack={() => router.back()} />;
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top']}> 
+      <ProductDetails product={product} onBack={() => router.back()} />
+    </SafeAreaView>
+  );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#006FFD", //Color del navbar
+  },
+});

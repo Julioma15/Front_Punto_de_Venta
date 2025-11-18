@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
-import { View, Text, Image, StyleSheet, Animated, Dimensions } from "react-native";
 import { router } from "expo-router";
+import { useEffect, useRef } from "react";
+import { Animated, Dimensions, Image, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,32 +29,34 @@ export default function SplashScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      {/* FONDO DE CÍRCULOS */}
-      <Image
-        source={require("../app/assets/images/circulos-marco.png")}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      />
-
-      {/* CONTENIDO ANIMADO */}
-      <Animated.View style={[styles.centerGroup, {
-        opacity: fadeAnim,
-        transform: [{ scale: scaleAnim }]
-      }]}>
-        
-        <Text style={styles.title}>TUUDU</Text>
-
+    <SafeAreaView style={styles.safeArea} edges={['top']}> 
+      <View style={styles.container}>
+        {/* FONDO DE CÍRCULOS */}
         <Image
-          source={require("../app/assets/images/kiosco-logo.png")}
-          style={styles.kiosko}
+          source={require("../app/assets/images/circulos-marco.png")}
+          style={styles.backgroundImage}
+          resizeMode="cover"
         />
 
-        {/* Punto indicador */}
-        <Text style={styles.dots}>● ● ●</Text>
+        {/* CONTENIDO ANIMADO */}
+        <Animated.View style={[styles.centerGroup, {
+          opacity: fadeAnim,
+          transform: [{ scale: scaleAnim }]
+        }]}>
+          
+          <Text style={styles.title}>TUUDU</Text>
 
-      </Animated.View>
-    </View>
+          <Image
+            source={require("../app/assets/images/kiosco-logo.png")}
+            style={styles.kiosko}
+          />
+
+          {/* Punto indicador */}
+          <Text style={styles.dots}>● ● ●</Text>
+
+        </Animated.View>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -97,5 +100,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 30,
     opacity: 0.7,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#006FFD", //Color del navbar
   },
 });
