@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-const MainApp_Layout = ()=>{
+const DetallesProducto_Layout = ()=>{
     return (
         <Stack
             screenOptions={{
@@ -11,4 +11,4 @@ const MainApp_Layout = ()=>{
     )
 }
 
-export default MainApp_Layout
+export default DetallesProducto_Layout
