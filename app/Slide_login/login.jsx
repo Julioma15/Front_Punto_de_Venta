@@ -43,7 +43,6 @@ export default function LoginScreen() {
         <Image source={require("../assets/images/logo-globo.png")} style={styles.logo} />
         <LoginBox onSubmit={handleLogin} />
       </Animated.View>
-      <Image source={require("../assets/images/kiosco-logo.png")} style={styles.logoBottom} />
     </View>
   );
 }
