@@ -20,9 +20,9 @@ const SlideNavbar = ({onClose }) => {
     if (onClose) onClose();
     
     if (item.title === 'Productos') {
-      router.push('../Slide_productos');
+      router.push('/Slide_products');
     }else if (item.title === 'Log-out'){
-        router.replace("/Slide_login/login");
+        router.replace("/");
     } 
   };
 
