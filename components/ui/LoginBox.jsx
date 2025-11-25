@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { useState } from "react";
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginBox({ onSubmit }) {
   const [user, setUser] = useState("");
@@ -15,39 +16,43 @@ export default function LoginBox({ onSubmit }) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>INICIO DE SESIÓN</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>INICIO DE SESIÓN</Text>
+        </View>
+
+        <View style={styles.inputsWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="Usuario"
+            placeholderTextColor="grey"
+            value={user}
+            onChangeText={setUser}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña"
+            placeholderTextColor="grey"
+            secureTextEntry      // ← Esto hace que sea contraseña
+            value={pass}
+            onChangeText={setPass}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            user && pass ? styles.buttonEnabled : styles.buttonDisabled,
+          ]}
+          onPress={handleLoginPress}
+          disabled={!user || !pass}
+        >
+          <Text style={styles.buttonText}>Iniciar sesión</Text>
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.inputsWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Usuario"
-          value={user}
-          onChangeText={setUser}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          secureTextEntry      // ← Esto hace que sea contraseña
-          value={pass}
-          onChangeText={setPass}
-        />
-      </View>
-
-      <TouchableOpacity
-        style={[
-          styles.button,
-          user && pass ? styles.buttonEnabled : styles.buttonDisabled,
-        ]}
-        onPress={handleLoginPress}
-        disabled={!user || !pass}
-      >
-        <Text style={styles.buttonText}>Iniciar sesión</Text>
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -117,5 +122,10 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontWeight: "600",
     fontSize: 18,
+  },
+
+  safeArea: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
