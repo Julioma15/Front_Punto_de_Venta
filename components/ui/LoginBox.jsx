@@ -1,71 +1,68 @@
-import { router } from "expo-router";
-import { useEffect, useRef, useState } from "react";
-import { Animated, Image, StyleSheet, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
-import LoginBox from "../../components/ui/LoginBox";
 
-export default function LoginScreen() {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const translateAnim = useRef(new Animated.Value(25)).current;
+// Recibimos isLoading y errorMessage como props
+export default function LoginBox({ onSubmit, isLoading, errorMessage }) {
+  const [user, setUser] = useState("");
+  const [pass, setPass] = useState("");
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
-    Animated.timing(translateAnim, { toValue: 0, duration: 400, useNativeDriver: true }).start();
-  }, []);
-
-  const handleLogin = async (username, password) => {
-    setIsLoading(true);
-    setErrorMessage("");
-
-    try {
-      const response = await axios.post('https://punto-de-venta-dqx2.onrender.com/users/logIn', {
-        username: username,
-        password: password
-      });
-
-      if (response.status === 200) {
-        // --- AQUÍ GUARDAMOS EL TOKEN ---
-        const token = response.data.accessToken;
-        
-        // 'userToken' es la llave con la que lo guardamos. 
-        await SecureStore.setItemAsync('userToken', token);
-        
-        console.log("Token guardado con éxito:", token); // Para verificar en consola
-
-        router.replace("/Slide_products");
-      }
-
-    } catch (error) {
-      console.log(error);
-      if (error.response) {
-        if (error.response.status === 401) {
-          setErrorMessage("Credenciales incorrectas. Verifique usuario y contraseña.");
-        } else {
-          setErrorMessage("Ocurrió un error en el servidor. Intente más tarde.");
-        }
-      } else if (error.request) {
-        setErrorMessage("Error de conexión. Verifique su internet.");
-      } else {
-        setErrorMessage("Error inesperado al intentar ingresar.");
-      }
-    } finally {
-      setIsLoading(false);
+  const handleLoginPress = () => {
+    if (!user.trim() || !pass.trim()) {
+      Alert.alert("Campos incompletos", "Por favor ingresa usuario y contraseña.");
+      return;
     }
+    onSubmit(user, pass); 
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.ellipse} />
-        <Animated.View style={{ transform: [{ translateY: translateAnim }], opacity: fadeAnim, alignItems: "center" }}>
-          <Image source={require("../assets/images/logo-globo.png")} style={styles.logo} />
-          <LoginBox onSubmit={handleLogin} isLoading={isLoading} errorMessage={errorMessage} />
-        </Animated.View>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>INICIO DE SESIÓN</Text>
+        </View>
+
+        <View style={styles.inputsWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="Usuario"
+            placeholderTextColor="grey"
+            value={user}
+            onChangeText={setUser}
+            autoCapitalize="none" // Importante para usuarios
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña"
+            placeholderTextColor="grey"
+            secureTextEntry
+            value={pass}
+            onChangeText={setPass}
+          />
+        </View>
+        
+        {/* SECCIÓN DE ERROR: Solo se muestra si hay un mensaje de error */}
+        {errorMessage ? (
+            <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+        ) : null}
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            (user && pass && !isLoading) ? styles.buttonEnabled : styles.buttonDisabled,
+          ]}
+          onPress={handleLoginPress}
+          disabled={!user || !pass || isLoading} // Deshabilitado si carga o faltan datos
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <Text style={styles.buttonText}>Iniciar sesión</Text>
+          )}
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
