@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import { useState } from "react";
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from "react";
 import { Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import SlideNavbar from '../Slide_navbar/index';
@@ -10,7 +10,13 @@ const SlideProductos = () => {
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [productoActivo, setProductoActivo] = useState(true);
 
-  const router = useRouter()
+  const router = useRouter();
+  const params = useLocalSearchParams();
+
+  // Ruz te agregue esto para navegar a Agregar.jsx
+  const goAgregar = () => {
+    router.push('/Detalles_producto/Agregar');
+  };
 
   const productos = [
     {
@@ -45,6 +51,22 @@ const SlideProductos = () => {
     setModalVisible(false);
     setProductoSeleccionado(null);
   };
+
+  // Manejar producto agregado al volver desde Agregar.jsx
+  useEffect(() => {
+    if (params?.newProduct) {
+      try {
+        const prod = JSON.parse(params.newProduct);
+        // agrega prod al estado de productos (ejemplo):
+        // setProductos(prev => [prod, ...prev]);
+        console.log('Producto agregado:', prod);
+        // opcional: navegar a la misma ruta sin params para limpiarlos:
+        // router.replace('/Slide_products');
+      } catch (e) {
+        console.warn('No se pudo parsear newProduct', e);
+      }
+    }
+  }, [params?.newProduct]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}> 
@@ -86,7 +108,7 @@ const SlideProductos = () => {
         </ScrollView>
 
         {/* Botón Agregar */}
-        <TouchableOpacity style={styles.btnAgregar}>
+        <TouchableOpacity onPress={goAgregar} style={styles.btnAgregar}>
           <Text style={styles.agregarIcono}>+</Text>
         </TouchableOpacity>
 
