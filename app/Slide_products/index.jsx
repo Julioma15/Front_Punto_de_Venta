@@ -15,7 +15,7 @@ const SlideProductos = () => {
 
   // Ruz te agregue esto para navegar a Agregar.jsx
   const goAgregar = () => {
-    router.push('/Detalles_agregar/index');
+    router.push('/Slide_agregar/index');
   };
 
   const productos = [
