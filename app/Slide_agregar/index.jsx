@@ -66,17 +66,6 @@ export const SlideDetalles = () => {
           contentContainerStyle={styles.formContainer}
           showsVerticalScrollIndicator={false}
         >
-          {/* ID */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>ID</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.id}
-              onChangeText={(text) => handleChange('id', text)}
-              placeholder="0001"
-            />
-          </View>
-
           {/* Producto */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Producto</Text>
@@ -85,17 +74,6 @@ export const SlideDetalles = () => {
               value={formData.producto}
               onChangeText={(text) => handleChange('producto', text)}
               placeholder="Nombre del producto"
-            />
-          </View>
-
-          {/* Descripción */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Descripción</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.descripcion}
-              onChangeText={(text) => handleChange('descripcion', text)}
-              placeholder="Descripción del producto"
             />
           </View>
 
