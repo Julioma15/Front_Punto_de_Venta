@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect, useRoute } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
+import { useRouter } from 'expo-router';
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Image, Modal, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,7 +18,7 @@ const SlideProductos = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  const router = useRoute();
+  const router = useRouter();
 
   const cargarProductos = async () => {
     try {
@@ -101,7 +102,7 @@ const SlideProductos = () => {
 
       const nuevoEstado = productoActivo ? "Disable" : "Enable";
 
-      await axios.put(
+      await axios.patch(
         `${API_BASE_URL}/productos/${producto.id}/product_state`,
         { product_state: nuevoEstado },
         {

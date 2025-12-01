@@ -8,13 +8,7 @@ const SlideNavbar = ({onClose }) => {
 
   const menuItems = [
     { id: 1, title: "Productos", subtitle: null },
-    { id: 2, title: "Inventario", subtitle: null },
-    { 
-      id: 3, 
-      title: "Ventas", 
-      subtitle: ["Hacer venta", "Resumen de ventas"] 
-    },
-    { id: 4, title: "Resumen", subtitle: null },
+    { id: 2, title: "Productos desactivados", subtitle: null },
     { id: 5, title: "Log-out", subtitle: null },
   ];
 
@@ -31,7 +25,9 @@ const SlideNavbar = ({onClose }) => {
       } catch (err) {
         console.error('Error al cerrar sesión:', err);
       }
-    } 
+    } else if (item.title === 'Productos desactivados'){
+      router.push('/Slide_productos_desactivados');
+    }
   };
 
   return (
