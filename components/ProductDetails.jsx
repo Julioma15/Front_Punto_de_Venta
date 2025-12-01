@@ -23,12 +23,7 @@ const ProductDetails = ({ product, onBack }) => {
           <View style={styles.inputBox}><Text>{product.name}</Text></View>
         </View>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Descripción</Text>
-          <View style={styles.inputBox}><Text>{product.description}</Text></View>
-        </View>
-
-        <View style={styles.row}> 
+        <View style={styles.row}>
           <View style={{ flex: 1 }}>
             <Text style={styles.label}>Imagen</Text>
             <View style={styles.imageWrap}>

@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Modal,
@@ -18,34 +18,95 @@ import { getToken } from '../utils/auth';
 
 export default function DetallesProductoPage() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const idParam = params.id || params.id_producto || params.id_product;
+
   const [menuVisible, setMenuVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // estado del producto (editable)
+  // estado del producto (INICIALIZAR VACÍO) - quitada descripción
   const [product, setProduct] = useState({
-    id: '0001',
-    name: 'Sabritas Original',
-    description: 'Sabritas Original 18gr',
-    stock: 32,
-    price: '$ 22.00',
-    barcode: '784222156864',
+    id: null,
+    name: '',
+    stock: 0,
+    price: '$ 0.00',
+    barcode: '',
     image: require('../assets/images/sabritas_original.png'),
   });
 
   // campos para editar (se rellenan al entrar en modo edición)
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
   const [stock, setStock] = useState('');
   const [price, setPrice] = useState('');
   const [barcode, setBarcode] = useState('');
 
   const API_BASE_URL = 'https://punto-de-venta-dqx2.onrender.com';
+  const API_MEDIA_URL = API_BASE_URL;
+
+  const mapFetchedData = (data) => {
+    const fetched = data.product;
+    if (!Array.isArray(fetched)) return null;
+
+    const id = fetched[0];
+    const name = fetched[1];
+    const barcode = fetched[2];
+    const price = fetched[3];
+    const stock = fetched[4];
+    const imageUrl = fetched[7];
+
+    return {
+      id: String(id),
+      name: name || '',
+      stock: Number(stock ?? 0),
+      price: `$ ${Number(price ?? 0).toFixed(2)}`,
+      barcode: barcode || '',
+      image: imageUrl ? { uri: API_MEDIA_URL + imageUrl } : require('../assets/images/sabritas_original.png'),
+    };
+  };
+
+  const fetchProductDetails = async () => {
+    if (!idParam) {
+      Alert.alert('Error de Navegación', 'ID de producto no especificado.');
+      setIsLoading(false);
+      router.back();
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const token = await getToken();
+      if (!token) {
+        Alert.alert('Error de autenticación', 'No se encontró el token. Inicia sesión de nuevo.');
+        router.replace('/Slide_login');
+        return;
+      }
+
+      const res = await axios.get(`${API_BASE_URL}/productos/${idParam}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.data?.product) {
+        const mapped = mapFetchedData(res.data);
+        if (mapped) setProduct(mapped);
+        else Alert.alert('Error', 'Respuesta del servidor inválida.');
+      } else {
+        Alert.alert('Error', 'Producto no encontrado o respuesta vacía.');
+      }
+    } catch (err) {
+      console.error('Error al cargar producto:', err.response?.data || err.message);
+      Alert.alert('Error', 'No se pudo cargar la información del producto.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductDetails();
+  }, [idParam]);
 
   const openEdit = () => {
-    // rellenar campos con los valores actuales
     setName(product.name || '');
-    setDescription(product.description || '');
-    // quitar símbolo $ si existe
     const numericPrice = String(product.price || '').replace(/[^0-9.,]/g, '').replace(',', '.');
     setPrice(numericPrice);
     setStock(String(product.stock ?? '0'));
@@ -58,7 +119,6 @@ export default function DetallesProductoPage() {
   };
 
   const saveEdit = async () => {
-    // validaciones
     if (!name.trim()) {
       Alert.alert('Faltan datos', 'El nombre del producto es obligatorio.');
       return;
@@ -83,7 +143,7 @@ export default function DetallesProductoPage() {
       const token = await getToken();
       if (!token) {
         Alert.alert('Error de autenticación', 'No se encontró el token. Inicia sesión de nuevo.');
-        router.replace('/');
+        router.replace('/Slide_login');
         return;
       }
 
@@ -92,11 +152,9 @@ export default function DetallesProductoPage() {
         price: Number(validatedPrice).toFixed(2),
         stock: validatedStock,
         barcode: barcode.trim(),
-        // description: description.trim() // incluir si el backend lo acepta
       };
 
-      // Ajusta endpoint según tu API real. Aquí uso PUT /productos/:id
-      const res = await axios.put(`${API_BASE_URL}/productos/${product.id}`, payload, {
+      const res = await axios.patch(`${API_BASE_URL}/productos/${idParam}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -104,11 +162,9 @@ export default function DetallesProductoPage() {
       });
 
       if (res.status === 200 || res.status === 204) {
-        // actualizar estado local con valores guardados
         setProduct(prev => ({
           ...prev,
           name: payload.product_name,
-          description: description,
           stock: payload.stock,
           price: `$ ${Number(payload.price).toFixed(2)}`,
           barcode: payload.barcode,
@@ -124,7 +180,7 @@ export default function DetallesProductoPage() {
       if (err.response) {
         if (err.response.status === 401) {
           msg = 'Token inválido o expirado.';
-          router.replace('/');
+          router.replace('/Slide_login');
         } else if (err.response.data?.error) {
           msg = err.response.data.error;
         }
@@ -148,30 +204,22 @@ export default function DetallesProductoPage() {
 
           <Text style={styles.logo}>TUUDU</Text>
 
-          {/* derecha: botón editar (lápiz). si está en edición se muestra botón guardar/cancelar en formulario */}
           <TouchableOpacity style={styles.editButton} onPress={openEdit}>
             <Text style={styles.editIcon}>✎</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.content}>
-          {!isEditing ? (
-            // vista no editable: reusa componente ProductDetails
+          {isLoading ? (
+            <Text style={{ textAlign: 'center', marginTop: 50, fontSize: 18 }}>Cargando detalles...</Text>
+          ) : product.id === null ? (
+            <Text style={{ textAlign: 'center', marginTop: 50, fontSize: 18 }}>Producto no encontrado.</Text>
+          ) : !isEditing ? (
             <ProductDetails product={product} onBack={() => router.back()} />
           ) : (
-            // formulario de edición
             <ScrollView contentContainerStyle={styles.editForm}>
               <Text style={styles.label}>Producto</Text>
               <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Nombre" />
-
-              <Text style={styles.label}>Descripción</Text>
-              <TextInput
-                style={[styles.input, styles.multiline]}
-                value={description}
-                onChangeText={setDescription}
-                placeholder="Descripción"
-                multiline
-              />
 
               <Text style={styles.label}>Stock</Text>
               <TextInput style={styles.input} value={stock} onChangeText={setStock} keyboardType="numeric" />
