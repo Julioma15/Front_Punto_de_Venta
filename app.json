@@ -25,10 +25,11 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "CAMERA", 
+        "CAMERA",
         "READ_MEDIA_IMAGES"
       ],
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.pamela123.POSFront"
     },
     "web": {
       "output": "static",
@@ -39,7 +40,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./app/assets/images/kiosco-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -53,6 +54,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b24e2777-da3d-4817-b552-e238a9811d80"
+      }
     }
   }
 }
