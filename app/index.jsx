@@ -38,7 +38,25 @@ const SlideProductos = () => {
       });
 
       console.log("Productos cargados:", response.data);
-      setProductos(response.data);
+
+      if (!response.data.products || !Array.isArray(response.data.products)) {
+        setProductos([]);
+        setError("No hay productos disponibles");
+        return;
+      }
+
+      const productosFormateados = response.data.products.map(p => ({
+        id: p[0],
+        product_name: p[1],
+        barcode: p[2],
+        price: p[3],
+        stock: p[4],
+        createdAt: p[5],
+        status: p[6],
+        imagen_url: p[7] ? `${API_BASE_URL}${p[7]}` : null,
+      }));
+
+      setProductos(productosFormateados);
 
     } catch (err) {
       console.error("Error al cargar productos:", err);
@@ -145,9 +163,9 @@ const SlideProductos = () => {
           >
             {productos.map((producto) => (
               <TouchableOpacity
-                key={producto.id || producto._id}
+                key={producto.id}
                 style={styles.productoCard}
-                onPress={() => router.push(`/Detalles_producto?id=${producto.id || producto._id}`)}
+                onPress={() => router.push(`/Detalles_producto?id=${producto.id}`)}
               >
 
                 {/* ----------- IMAGEN ----------- */}
@@ -198,7 +216,6 @@ const SlideProductos = () => {
         <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={cerrarModal}>
           <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={cerrarModal}>
             <TouchableOpacity style={styles.modalContent} activeOpacity={1}>
-
               <View style={styles.opcionRow}>
                 <TouchableOpacity
                   style={[styles.toggle, productoActivo && styles.toggleActive]}
@@ -213,7 +230,7 @@ const SlideProductos = () => {
                 style={styles.opcionRow}
                 onPress={() => {
                   cerrarModal();
-                  router.push(`/Detalles_producto?id=${productoSeleccionado?.id || productoSeleccionado?._id}`);
+                  router.push(`/Detalles_producto?id=${productoSeleccionado?.id}`);
                 }}
               >
                 <View style={styles.iconContainer}>
