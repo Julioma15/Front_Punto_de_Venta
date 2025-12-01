@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'; // <--- Importar AsyncStorage
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,13 +18,19 @@ const SlideNavbar = ({onClose }) => {
     { id: 5, title: "Log-out", subtitle: null },
   ];
 
-  const GestorDeEventos = (item) => {
+  const GestorDeEventos = async (item) => {
     if (onClose) onClose();
     
     if (item.title === 'Productos') {
       router.push('/Slide_products');
-    }else if (item.title === 'Log-out'){
-        router.replace("/");
+    } else if (item.title === 'Log-out') {
+      // --- BORRAR TOKEN Y REDIRIGIR ---
+      try {
+        await AsyncStorage.removeItem('userToken'); // Borrar token
+        router.replace('/Slide_login'); // Redirigir a login
+      } catch (err) {
+        console.error('Error al cerrar sesión:', err);
+      }
     } 
   };
 
@@ -49,7 +56,7 @@ const SlideNavbar = ({onClose }) => {
                 <Text style={styles.menuTxt}>{item.title}</Text>
               </TouchableOpacity>
 
-              {/* Analizando las Subtítulos (subsecciones)*/}
+              {/* Analizando los Subtítulos (subsecciones)*/}
               {item.subtitle && (
                 <View style={styles.submenuContainer}>
                   {item.subtitle.map((sub, subIndex) => (
@@ -143,7 +150,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff", //Color del navbar
+    backgroundColor: "#fff", 
   },
 });
 
