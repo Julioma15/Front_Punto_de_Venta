@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 import axios from 'axios';
-import { useRouter } from 'expo-router';
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Image, Modal, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,8 +17,7 @@ const SlideProductos = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-
-  const router = useRouter();
+  const router = useRoute();
 
   const cargarProductos = async () => {
     try {
@@ -38,24 +36,25 @@ const SlideProductos = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      console.log("Productos cargados:", response.data);
-
       if (!response.data.products || !Array.isArray(response.data.products)) {
         setProductos([]);
         setError("No hay productos disponibles");
         return;
       }
 
-      const productosFormateados = response.data.products.map(p => ({
-        id: p[0],
-        product_name: p[1],
-        barcode: p[2],
-        price: p[3],
-        stock: p[4],
-        createdAt: p[5],
-        status: p[6],
-        imagen_url: p[7] ? `${API_BASE_URL}${p[7]}` : null,
-      }));
+      // Mapeo y filtrado solo activos
+      const productosFormateados = response.data.products
+        .map(p => ({
+          id: p[0],
+          product_name: p[1],
+          barcode: p[2],
+          price: p[3],
+          stock: p[4],
+          createdAt: p[5],
+          status: p[6],
+          imagen_url: p[7] ? `${API_BASE_URL}${p[7]}` : null,
+        }))
+        .filter(p => p.status === "Enable"); // <-- Solo Enable
 
       setProductos(productosFormateados);
 
@@ -65,22 +64,6 @@ const SlideProductos = () => {
       setProductos([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const obtenerProductoPorId = async (id) => {
-    try {
-      const token = await AsyncStorage.getItem("userToken");
-
-      const response = await axios.get(`${API_BASE_URL}/productos/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      return response.data;
-
-    } catch (err) {
-      console.error("Error al obtener producto:", err);
-      return null;
     }
   };
 
@@ -102,13 +85,43 @@ const SlideProductos = () => {
 
   const abrirOpciones = (producto) => {
     setProductoSeleccionado(producto);
-    setProductoActivo(producto.status === "Enable"); // Para toggle
+    setProductoActivo(producto.status === "Enable");
     setModalVisible(true);
   };
 
   const cerrarModal = () => {
     setModalVisible(false);
     setProductoSeleccionado(null);
+  };
+
+  const toggleProductState = async (producto) => {
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      if (!token) return;
+
+      const nuevoEstado = productoActivo ? "Disable" : "Enable";
+
+      await axios.put(
+        `${API_BASE_URL}/productos/${producto.id}/product_state`,
+        { product_state: nuevoEstado },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Actualizar lista local
+      setProductos(prev =>
+        prev.map(p =>
+          p.id === producto.id ? { ...p, status: nuevoEstado } : p
+        ).filter(p => p.status === "Enable") // Filtrar solo Enable
+      );
+
+      setProductoActivo(!productoActivo);
+      cerrarModal();
+
+    } catch (err) {
+      console.error("Error al actualizar estado:", err.response?.data || err.message);
+    }
   };
 
   return (
@@ -129,7 +142,7 @@ const SlideProductos = () => {
           </View>
         </View>
 
-        {/* ---- CONTENIDO ---- */}
+        {/* CONTENIDO */}
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#006FFD" />
@@ -162,10 +175,7 @@ const SlideProductos = () => {
                 onPress={() => router.push(`/Detalles_producto?id=${producto.id}`)}
               >
                 {producto.imagen_url ? (
-                  <Image
-                    source={{ uri: producto.imagen_url }}
-                    style={styles.productoImagen}
-                  />
+                  <Image source={{ uri: producto.imagen_url }} style={styles.productoImagen} />
                 ) : (
                   <View style={styles.placeholderImagen}>
                     <Text style={styles.placeholderText}>📦</Text>
@@ -207,11 +217,13 @@ const SlideProductos = () => {
               <View style={styles.opcionRow}>
                 <TouchableOpacity
                   style={[styles.toggle, productoActivo && styles.toggleActive]}
-                  onPress={() => setProductoActivo(!productoActivo)}
+                  onPress={() => toggleProductState(productoSeleccionado)}
                 >
                   <View style={[styles.toggleCircle, productoActivo && styles.toggleCircleActive]} />
                 </TouchableOpacity>
-                <Text style={styles.opcionTxt}>Desactivar producto</Text>
+                <Text style={styles.opcionTxt}>
+                  {productoActivo ? "Desactivar producto" : "Activar producto"}
+                </Text>
               </View>
 
               <TouchableOpacity
@@ -318,7 +330,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
@@ -328,7 +343,7 @@ const styles = StyleSheet.create({
     height: 75,
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   placeholderImagen: {
     width: 75,
@@ -378,7 +393,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#006FFD",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
     shadowOpacity: 0.4,
     shadowRadius: 12,
     elevation: 8,
@@ -479,7 +497,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: "#FFFFFF",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 3,
@@ -531,5 +552,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });
+
 
 export default SlideProductos;
