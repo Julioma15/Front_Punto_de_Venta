@@ -9,7 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Esta app mecesita acceso a la camasra",
+        "NSPhotoLibraryUsageDescription": "Esta app necesita acceso a la galeria",
+        "NSPhotoLibraryAddUsageDescription": "Esta app necesita accesp a la galeria para añadir fotos"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,6 +24,10 @@
         "monochromeImage": "./app/assets/images/kiosko-fondo.png"
       },
       "edgeToEdgeEnabled": true,
+      "permissions": [
+        "CAMERA", 
+        "READ_MEDIA_IMAGES"
+      ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
