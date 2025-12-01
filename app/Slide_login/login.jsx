@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Animated, Image, StyleSheet, View, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
-//import * as SecureStore from 'expo-secure-store'; -->para luego
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
 import LoginBox from "../../components/ui/LoginBox";
 
 export default function LoginScreen() {
@@ -30,6 +30,11 @@ export default function LoginScreen() {
 
       if (response.status === 200) {
         const token = response.data.accessToken;
+        
+        // Guardamos el token
+        await AsyncStorage.setItem('userToken', token);
+        //console.log("Token guardado correctamente:");
+        
         router.replace("/Slide_products");
       }
 
@@ -53,17 +58,11 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {/* 2. Envolvemos todo en KeyboardAvoidingView. 
-         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} es la configuración estándar que funciona mejor.
-      */}
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
-        {/* 3. TouchableWithoutFeedback sirve para cerrar el teclado al tocar afuera 
-        */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          
           <View style={styles.container}>
             <View style={styles.ellipse} />
 
@@ -83,7 +82,6 @@ export default function LoginScreen() {
               />
             </Animated.View>
           </View>
-        
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -91,12 +89,6 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  centerWrapper: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: -40,
-  },
   container: {
     flex: 1,
     backgroundColor: "#FFF",
@@ -110,13 +102,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#80deea66",
     borderRadius: 250,
     top: "25%",
-  },
-  logoBottom: {
-    width: 200,
-    height: 260,
-    resizeMode: "contain",
-    position: "absolute",
-    bottom: -40,
   },
   logo: {
     marginBlock: 20,
