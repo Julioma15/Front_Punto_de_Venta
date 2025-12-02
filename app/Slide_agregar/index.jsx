@@ -3,13 +3,14 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const API_BASE_URL = 'https://punto-de-venta-dqx2.onrender.com';
 
 const SlideAgregar = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false); // Estado de carga
   const [formData, setFormData] = useState({
     producto: '',
     stock: '',
@@ -36,20 +37,29 @@ const SlideAgregar = () => {
   };
 
   const handleAgregar = async () => {
+    // Validación básica
+    if (!formData.producto || !formData.precio || !formData.stock || !formData.barcode) {
+      Alert.alert('Error', 'Por favor completa todos los campos');
+      return;
+    }
+
     try {
+      setLoading(true); // Activar loading
+
       // Obtener token
       const token = await AsyncStorage.getItem('userToken');
       if (!token) {
-        console.log('Usuario no autenticado');
+        Alert.alert('Error', 'Usuario no autenticado');
+        setLoading(false);
         return;
       }
 
       // Preparar body del producto
       const body = {
         product_name: formData.producto,
-        price: parseFloat(formData.precio), // numeric
+        price: parseFloat(formData.precio),
         barcode: formData.barcode,
-        stock: parseInt(formData.stock, 10), // numeric
+        stock: parseInt(formData.stock, 10),
       };
 
       // 1️⃣ Crear producto
@@ -60,7 +70,7 @@ const SlideAgregar = () => {
         }
       });
 
-      const productoId = response.data.id_product; // id retornado por el backend
+      const productoId = response.data.id_product;
       console.log('Producto creado:', response.data);
 
       // 2️⃣ Subir imagen si hay
@@ -68,8 +78,8 @@ const SlideAgregar = () => {
         const formDataImagen = new FormData();
         formDataImagen.append('imagen', {
           uri: formData.imagen,
-          name: `producto_${productoId}.jpg`, // nombre de archivo
-          type: 'image/jpeg', // asumir jpg, o detectar con URI
+          name: `producto_${productoId}.jpg`,
+          type: 'image/jpeg',
         });
 
         const imgResponse = await axios.post(
@@ -86,12 +96,14 @@ const SlideAgregar = () => {
         console.log('Imagen subida:', imgResponse.data);
       }
 
-      alert('Producto agregado exitosamente');
+      Alert.alert('Éxito', 'Producto agregado correctamente');
       router.back();
 
     } catch (err) {
       console.error('Error al agregar producto:', err.response?.data || err.message);
-      alert('Error al agregar producto. Revisa la consola.');
+      Alert.alert('Error', 'No se pudo agregar el producto. Revisa tu conexión.');
+    } finally {
+      setLoading(false); // Desactivar loading
     }
   };
 
@@ -108,7 +120,11 @@ const SlideAgregar = () => {
 
           <Text style={styles.logo}>TUUDU</Text>
 
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => router.back()}
+            disabled={loading} // Deshabilitar mientras carga
+          >
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
         </View>
@@ -118,6 +134,7 @@ const SlideAgregar = () => {
           style={styles.scrollView}
           contentContainerStyle={styles.formContainer}
           showsVerticalScrollIndicator={false}
+          scrollEnabled={!loading} // Deshabilitar scroll mientras carga
         >
           {/* Producto */}
           <View style={styles.inputGroup}>
@@ -127,6 +144,7 @@ const SlideAgregar = () => {
               value={formData.producto}
               onChangeText={(text) => handleChange('producto', text)}
               placeholder="Nombre del producto"
+              editable={!loading} // Deshabilitar input mientras carga
             />
           </View>
 
@@ -134,7 +152,11 @@ const SlideAgregar = () => {
           <View style={styles.rowContainer}>
             <View style={styles.imagenContainer}>
               <Text style={styles.label}>Imagen</Text>
-              <TouchableOpacity style={styles.imagenSelector} onPress={seleccionarImagen}>
+              <TouchableOpacity 
+                style={styles.imagenSelector} 
+                onPress={seleccionarImagen}
+                disabled={loading} // Deshabilitar mientras carga
+              >
                 {formData.imagen ? (
                   <Image source={{ uri: formData.imagen }} style={styles.imagenPreview} />
                 ) : (
@@ -155,6 +177,7 @@ const SlideAgregar = () => {
                   onChangeText={(text) => handleChange('stock', text)}
                   placeholder="0"
                   keyboardType="numeric"
+                  editable={!loading} // Deshabilitar mientras carga
                 />
               </View>
 
@@ -168,6 +191,7 @@ const SlideAgregar = () => {
                     onChangeText={(text) => handleChange('precio', text)}
                     placeholder="0.00"
                     keyboardType="decimal-pad"
+                    editable={!loading} // Deshabilitar mientras carga
                   />
                 </View>
               </View>
@@ -183,12 +207,25 @@ const SlideAgregar = () => {
               onChangeText={(text) => handleChange('barcode', text)}
               placeholder="784222156864"
               keyboardType="numeric"
+              editable={!loading} // Deshabilitar mientras carga
             />
           </View>
 
-          {/* Botón Agregar */}
-          <TouchableOpacity style={styles.btnAgregar} onPress={handleAgregar}>
-            <Text style={styles.btnAgregarTexto}>Agregar</Text>
+          {/* Botón Agregar con Loading */}
+          <TouchableOpacity 
+            style={[styles.btnAgregar, loading && styles.btnAgregarDisabled]} 
+            onPress={handleAgregar}
+            disabled={loading} //Deshabilitar mientras carga
+          >
+            {loading ? (
+              // Spinner mientras carga
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color="#FFFFFF" />
+                <Text style={styles.btnAgregarTexto}>Agregando...</Text>
+              </View>
+            ) : (
+              <Text style={styles.btnAgregarTexto}>Agregar</Text>
+            )}
           </TouchableOpacity>
         </ScrollView>
 
@@ -203,13 +240,11 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: "#006FFD" 
   },
-
   container: { 
     flex: 1, 
     backgroundColor: "#EDF2FB", 
     width: "100%" 
   },
-
   navbar: {
     backgroundColor: "#006FFD",
     height: 80,
@@ -219,18 +254,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20
   },
-
   menuIcon: { 
     gap: 6 
   },
-
   menuLine: { 
     width: 30, 
     height: 3, 
     backgroundColor: "#FFFFFF", 
     borderRadius: 2 
   },
-
   logo: { 
     color: "#FFFFFF", 
     fontSize: 30, 
@@ -239,45 +271,37 @@ const styles = StyleSheet.create({
     left: "50%", 
     marginLeft: -54 
   },
-
   backButton: { 
     width: 40, 
     height: 40, 
     alignItems: "center", 
     justifyContent: "center" 
   },
-
   backArrow: { 
     color: "#FFFFFF", 
     fontSize: 28, 
     fontWeight: "600" 
   },
-
   scrollView: { 
     flex: 1 
   },
-
   formContainer: { 
     paddingHorizontal: 40, 
     paddingTop: 20, 
     paddingBottom: 100 
   },
-
   inputGroup: { 
     marginBottom: 16 
   },
-
   inputGroupSmall: { 
     marginBottom: 16 
   },
-
   label: { 
     fontSize: 14, 
     fontWeight: "600", 
     color: "#333333", 
     marginBottom: 8 
   },
-
   input: { 
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
@@ -288,7 +312,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#000000"
   },
-
   inputSmall: { 
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
@@ -299,17 +322,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#000000"
   },
-
   rowContainer: { 
     flexDirection: "row", 
     gap: 16, 
     marginBottom: 16 
   },
-
   imagenContainer: { 
     flex: 1 
   },
-
   imagenSelector: { 
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
@@ -320,28 +340,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     overflow: "hidden"
   },
-
   imagenTexto: { 
     fontSize: 14, 
     color: "#333333", 
     marginBottom: 8 
   },
-
   uploadIcon: { 
     fontSize: 24, 
     color: "#666666" 
   },
-
   imagenPreview: { 
     width: "100%", 
     height: "100%", 
     resizeMode: "cover" 
   },
-
   rightColumn: { 
     flex: 1 
   },
-
   precioContainer: { 
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
@@ -353,20 +368,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6
   },
-
   precioSymbol: { 
     fontSize: 14, 
     color: "#999999", 
     fontWeight: "500" 
   },
-
   precioInput: { 
     flex: 1, 
     fontSize: 14, 
     color: "#000000", 
     padding: 0 
   },
-
   btnAgregar: { 
     backgroundColor: "#006FFD",
     borderRadius: 12,
@@ -379,6 +391,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4
+  },
+  btnAgregarDisabled: {
+    backgroundColor: "#9CA3AF",
+    shadowOpacity: 0.1,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
 
   btnAgregarTexto: { 
@@ -397,8 +418,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(173, 198, 255, 0.2)",
     transform: [{ skewY: "-10deg" }],
     zIndex: -1
-  }
+  },
 });
-
 
 export default SlideAgregar;
